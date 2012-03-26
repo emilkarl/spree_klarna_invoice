@@ -8,13 +8,12 @@ module SpreeKlarnaInvoice
     config.generators do |g|
       g.test_framework :rspec
     end
-
+    
+    initializer "spree.gateway.payment_methods", :after => "spree.register.payment_methods" do |app|
+      app.config.spree.payment_methods << Spree::PaymentMethod::KlarnaInvoice
+    end
+    
     def self.activate
-      #Spree::PaymentMethod::KlarnaInvoice.register
-      initializer "spree_payment_network.register.payment_methods" do |app|
-        app.config.spree.payment_methods += [Spree::PaymentMethod::KlarnaInvoice]
-      end
-      
       Dir.glob(File.join(File.dirname(__FILE__), "../../app/**/*_decorator*.rb")) do |c|
         Rails.configuration.cache_classes ? require(c) : load(c)
       end

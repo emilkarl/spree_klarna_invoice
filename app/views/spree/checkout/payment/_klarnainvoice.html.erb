@@ -1,0 +1,13 @@
+<%= image_tag '/assets/store/klarna.gif', :id => 'klarna-image' %>
+<% param_prefix = "payment_source[#{payment_method.id}]" %>
+
+<p class="field" data-hook="sso">
+  <%= label_tag nil, t(:sso) %><br />
+  <% options_hash = Rails.env.production? ? {:autocomplete => 'off'} : {} %>
+  <%= text_field_tag "#{param_prefix}[sso]", '', options_hash.merge(:id => 'sso', :class => 'required', :size => 12, :maxlength => 12) %>
+  <span class="req">*</span>
+  &nbsp;
+</p>
+
+<%= hidden_field param_prefix, 'first_name', :value => @order.billing_firstname %>
+<%= hidden_field param_prefix, 'last_name', :value => @order.billing_lastname %>

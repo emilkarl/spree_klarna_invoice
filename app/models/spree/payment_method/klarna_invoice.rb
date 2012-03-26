@@ -1,11 +1,8 @@
 class Spree::PaymentMethod::KlarnaInvoice < Spree::PaymentMethod
-  preference :pnr, :string
-  preference :auth_code, :string
+  preference :country_code, :string
+  preference :store_id, :integer
+  preference :store_sectret, :string
   
-  def payment_profiles_supported?
-    false
-  end
-    
   def actions
     %w{capture void}
   end
@@ -34,6 +31,10 @@ class Spree::PaymentMethod::KlarnaInvoice < Spree::PaymentMethod
   
   def source_required?
     false
+  end
+  
+  def payment_source_class
+    Spree::KlarnaCustomer
   end
 end
 

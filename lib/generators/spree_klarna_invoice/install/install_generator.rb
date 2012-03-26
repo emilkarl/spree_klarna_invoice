@@ -11,7 +11,7 @@ module SpreeKlarnaInvoice
         inject_into_file "app/assets/stylesheets/store/all.css", " *= require store/spree_klarna_invoice\n", :before => /\*\//, :verbose => true
         inject_into_file "app/assets/stylesheets/admin/all.css", " *= require admin/spree_klarna_invoice\n", :before => /\*\//, :verbose => true
       end
-
+      
       def add_migrations
         run 'bundle exec rake railties:install:migrations FROM=spree_klarna_invoice'
       end
