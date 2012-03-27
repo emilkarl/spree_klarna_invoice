@@ -33,10 +33,6 @@ class Spree::PaymentMethod::KlarnaInvoice < Spree::PaymentMethod
     payment.complete
     true
   end
-  
-  def payment_source_class
-    Spree::KlarnaCustomer
-  end
 end
 
 
