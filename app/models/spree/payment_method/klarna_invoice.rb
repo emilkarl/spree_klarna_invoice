@@ -1,5 +1,5 @@
 class Spree::PaymentMethod::KlarnaInvoice < Spree::PaymentMethod
-  preference :country_code, :string
+  preference :country_code, :string, :default => 'SE'
   preference :store_id, :integer
   preference :store_sectret, :string
   
@@ -18,6 +18,8 @@ class Spree::PaymentMethod::KlarnaInvoice < Spree::PaymentMethod
   end
   
   def capture(payment)
+    logger.info payment
+    
     payment.update_attribute(:state, 'pending') if payment.state == 'checkout'
     payment.complete
     true
