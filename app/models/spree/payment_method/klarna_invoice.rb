@@ -7,19 +7,15 @@ class Spree::PaymentMethod::KlarnaInvoice < Spree::PaymentMethod
     %w{capture}
   end
   
-  def require_source?
-    false
+  def source_required?
+    true
   end
   
-  # Indicates whether its possible to capture the payment
-  def can_capture?(payment)
-    ['checkout', 'pending'].include?(payment.state) #&& payment.order.klarna_invoice_number.blank?
+  def payment_source_class
+    Spree::KlarnaPayment
   end
-
-  def capture(payment)
-    logger.info "\n\n\n------------------ CAPTURE ------------------\n"
-    payment.update_attribute(:state, 'pending') if payment.state == 'checkout'
-    payment.complete
+  
+  def payment_profiles_supported?
     true
   end
 end
