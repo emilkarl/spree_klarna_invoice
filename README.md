@@ -7,7 +7,7 @@ Makes it possible to invoice customers with Klarna's services. Read more on Klar
 Todo
 =======
 
-- -Auto capture-
+- ~~Auto capture~~
 - Write tests
 
 Copyright (c) 2012 Emil Karlsson
