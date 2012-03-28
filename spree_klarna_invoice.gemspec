@@ -4,7 +4,7 @@ Gem::Specification.new do |s|
   s.name        = 'spree_klarna_invoice'
   s.version     = '1.0.0'
   s.summary     = 'Spree extenstion for Klarna Invoice Payment Method'
-  s.description = 'Makes it possible to invoice customers with Klarnas services. Read more on Klara at http://klarna.com'
+  s.description = 'Makes it possible to invoice customers with Klarna\'s services. Read more on Klara at http://klarna.com'
   s.required_ruby_version = '>= 1.8.7'
 
   s.author            = 'Emil Karlsson'
