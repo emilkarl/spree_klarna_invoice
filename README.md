@@ -9,6 +9,8 @@ Based on Klarna-ruby it is using the old Klarna API. There is a newer version an
 
 Based on *[klarna-ruby library](https://github.com/merchii/klarna-ruby)*
 
+Built for Spree 1.0.1
+
 ### Installation
 
 ...
