@@ -1,13 +1,15 @@
 Spree Klarna Invoice
 ==================
 
-Spree Payment method for Klarna invoice. http://klarna.com
+Spree extenstion for Klarna Invoice Payment Method.
+Makes it possible to invoice customers with Klarnas services. Read more on Klara at http://klarna.com
 
 
-Example
+Todo
 =======
 
-Example goes here.
+- Auto capture
+- Write tests
 
 Testing
 -------
