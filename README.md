@@ -24,4 +24,4 @@ Makes it possible to invoice customers with Klarna's services. Read more on Klar
 
 ---
 
-Copyright (c) 2012 [http://emilkarl.se](Emil Karlsson), [Noc Webbyrå](http://nocweb.se)
+Copyright (c) 2012 [Emil Karlsson]([http://emilkarl.se), [Noc Webbyrå](http://nocweb.se)
