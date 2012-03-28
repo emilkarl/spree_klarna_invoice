@@ -19,4 +19,4 @@ Todo
 - Send invoice via email
 - Implement Klarna API 2.0 and update klarna-ruby API
 
-Copyright (c) 2012 Emil Karlsson, [http://nocweb.se](Noc Webbyrå)
+Copyright (c) 2012 [http://emilkarl.se](Emil Karlsson), [Noc Webbyrå](http://nocweb.se)
