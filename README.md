@@ -7,7 +7,7 @@ Based on Klarna-ruby it is using the old Klarna API. There is a newer version an
 
 ### Requirements
 
-Based on *[klarna-ruby library](https://github.com/merchii/klarna-ruby)*
+Based on *[klarna-ruby](https://github.com/merchii/klarna-ruby)* library
 
 Built for Spree 1.0.1
 
