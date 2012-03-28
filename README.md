@@ -5,9 +5,14 @@ Spree extenstion for Klarna Invoice Payment Method.
 Makes it possible to invoice customers with Klarna's services. Read more on Klara at http://klarna.com
 
 Requirements
-=======
+===
 
+...
 
+Installation
+===
+
+...
 
 Todo
 =======
