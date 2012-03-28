@@ -1,15 +1,15 @@
 Spree Klarna Invoice
 ==================
 
-Spree extenstion for Klarna Invoice Payment Method.
-Makes it possible to invoice customers with Klarna's services. Read more on Klara at http://klarna.com
+Spree extenstion for Klarna Invoice Payment Method. Makes it possible to invoice customers with Klarna's services. Read more on Klara at http://klarna.com.
+
+Based on Klarna-ruby it is using the old Klarna API. There is a newer version and I intend to fork klarna-ruby and update it with the Klarna API 2.0.
 
 ### Requirements
 
-...
+Based on *[klarna-ruby library](https://github.com/merchii/klarna-ruby)*
 
 ### Installation
-
 
 ...
 
