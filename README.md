@@ -4,6 +4,11 @@ Spree Klarna Invoice
 Spree extenstion for Klarna Invoice Payment Method.
 Makes it possible to invoice customers with Klarna's services. Read more on Klara at http://klarna.com
 
+Requirements
+=======
+
+
+
 Todo
 =======
 
@@ -14,4 +19,4 @@ Todo
 - Send invoice via email
 - Implement Klarna API 2.0 and update klarna-ruby API
 
-Copyright (c) 2012 Emil Karlsson
+Copyright (c) 2012 Emil Karlsson, [http://nocweb.se](Noc Webbyrå)
