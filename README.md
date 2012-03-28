@@ -4,16 +4,16 @@ Spree Klarna Invoice
 Spree extenstion for Klarna Invoice Payment Method.
 Makes it possible to invoice customers with Klarna's services. Read more on Klara at http://klarna.com
 
-## Requirements
+### Requirements
 
 ...
 
-## Installation
+### Installation
 
 
 ...
 
-## Todo
+### Todo
 
 - ~~Auto capture~~
 - Write tests
