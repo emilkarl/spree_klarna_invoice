@@ -14,10 +14,6 @@ class Spree::KlarnaPayment < ActiveRecord::Base
     ['checkout', 'pending'].include?(payment.state) #&& payment.order.klarna_invoice_number.blank?
   end
 
-  def payment_profiles_supported?
-    false
-  end
-
   def capture(payment)
     logger.info "\n\n\n------------------ CAPTURE ------------------\n"
     logger.info "Country Code #{payment.payment_method.preferred(:country_code)}"

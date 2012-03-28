@@ -11,10 +11,6 @@ class Spree::PaymentMethod::KlarnaInvoice < Spree::PaymentMethod
     Spree::KlarnaPayment
   end
   
-  def payment_profiles_supported?
-    false
-  end
-  
   def actions
     %w{capture}
   end
