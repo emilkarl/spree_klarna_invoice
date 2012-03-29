@@ -1,6 +1,6 @@
-<%= image_tag '/assets/store/klarna.gif', :id => 'klarna-image' %><br>
+<%= image_tag '/assets/store/klarna.gif', :id => 'klarna-image' %>
 <% param_prefix = "payment_source[#{payment_method.id}]" %>
-<%= "#{I18n.t(:invoice_fee_before)} #{Spree::KlarnaPayment.preferred(:invoice_fee)} #{I18n.t(:invoice_fee_after)}" %>
+<%= "#{I18n.t(:invoice_fee_before)} #{Spree::PaymentMethod::KlarnaInvoice.preferred(:invoice_fee)} #{I18n.t(:invoice_fee_after)}" %>
 <p class="field" data-hook="sso">
   <%= label_tag nil, t(:sso) %><br />
   <% options_hash = Rails.env.production? ? {:autocomplete => 'off'} : {} %>
