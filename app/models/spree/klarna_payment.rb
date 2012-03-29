@@ -92,7 +92,9 @@ class Spree::KlarnaPayment < ActiveRecord::Base
 
     # Add shipment cost
     #order_items << @@klarna.make_goods(1, I18n.t(:shipment), I18n.t(:shipment), payment.order.ship_total * 100.00, 25, nil, ::Klarna::API::GOODS[:INC_VAT])
-
+    
+    order_items << @@klarna.make_goods(1, '', I18n.t(:invoice_fee), payment.payment_method.preferred(:invoice_fee) * 100.00, 25, nil, ::Klarna::API::GOODS[:INC_VAT]) if payment.payment_method.preferred(:invoice_fee) > 0
+    
     # Create address
     address = @@klarna.make_address("", payment.order.bill_address.address1, payment.order.bill_address.zipcode, payment.order.bill_address.city, payment.order.bill_address.country.iso, payment.order.bill_address.phone, nil, payment.order.email)
 
