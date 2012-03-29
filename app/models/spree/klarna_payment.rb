@@ -101,7 +101,7 @@ class Spree::KlarnaPayment < ActiveRecord::Base
     # Do transaction and create invoice in Klarna
     begin
       logger.debug "\n----------- add_transaction -----------\n"
-      shipping_cost = payment.order.ship_total * 100
+      shipping_cost = (payment.order.ship_total * 100) / 1.25
       invoice_no = @@klarna.add_transaction(
           "USER-#{payment.order.user_id}",                            # store_user_id,
           payment.order.number,                                       # order_id,
