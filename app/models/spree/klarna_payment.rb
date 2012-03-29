@@ -116,13 +116,13 @@ class Spree::KlarnaPayment < ActiveRecord::Base
           :SE,            # country, 
           :SV,            # language, 
           :SE)            # pno_encoding, 
-                                                                  # pclass = nil, 
-                                                                  # annual_salary = nil,
-                                                                  # password = nil, 
-                                                                  # ready_date = nil, 
-                                                                  # comment = nil, 
-                                                                  # rand_string = nil, 
-                                                                    # flags = nil
+                          # pclass = nil, 
+                          # annual_salary = nil,
+                          # password = nil, 
+                          # ready_date = nil, 
+                          # comment = nil, 
+                          # rand_string = nil, 
+                          # flags = nil
                                                                        
       logger.debug "\n----------- Invoice: #{invoice_no} -----------\n"                                                             
       self.update_attribute(:invoice_number, invoice_no)
@@ -135,7 +135,11 @@ class Spree::KlarnaPayment < ActiveRecord::Base
   def activate_invoice(payment)
     logger.debug "\n----------- KlarnaPayment.activate_invoice -----------\n"
     init_klarna(payment)
+    
+    raise Spree::Core::GatewayError.new(t(:mssing_invoice_number)) if self.invoice_number.blank?
+    
     @@klarna.activate_invoice(self.invoice_number)
+    @@klarna.email_invoice(self.invoice_number)
   end
   
   def gateway_error(text)
