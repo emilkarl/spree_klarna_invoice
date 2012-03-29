@@ -74,8 +74,10 @@ class Spree::KlarnaPayment < ActiveRecord::Base
     # Initialize Klarna connection
     init_klarna(payment)
     
-    #test_pno = "411028-8083" # Not approved
-    ssn = "410321-9202" # Approved - Should be taken from self.social_security_number later on...
+    #ssn = "411028-8083" # Not approved
+    #ssn = "410321-9202" # Approved
+    
+    ssn =  self.social_security_number
 
     # Implement verification to Klarna to get secret
     sso_secret = @@klarna.send(:digest, payment.payment_method.preferred(:store_id), ssn, payment.payment_method.preferred(:store_secret))
