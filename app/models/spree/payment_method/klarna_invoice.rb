@@ -7,6 +7,7 @@ class Spree::PaymentMethod::KlarnaInvoice < Spree::PaymentMethod
   preference :mode, :string, :default => :test
   preference :logging, :boolean, :default => true
   preference :http_logging, :boolean, :default => false
+  preference :invoice_fee, :integer, :default => 70
   
   def source_required?
     true

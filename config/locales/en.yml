@@ -3,3 +3,5 @@
 
 en:
   sso: 'Social Security Number'
+  invoice_fee_before: 'When paying with invoice an invoice fee will be applied at USD'
+  invoice_fee_after: ''
