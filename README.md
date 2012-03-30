@@ -16,19 +16,19 @@ Built for Spree 1.0.1
 
 ## To-do
 
-_High Prio_
+__High Prio__
 
 - Write tests
 - Production mode testing
 - Send invoice via mail
 - Update klarna-ruby for Klarna API 2.0
 
-_Completed_
+__Completed__
 
 - ~~Auto capture~~
 - ~~Send invoice via email~~
 
-h2. License
+## License
 
 Released under the MIT license.
 
