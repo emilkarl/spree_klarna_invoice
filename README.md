@@ -16,14 +16,14 @@ Built for Spree 1.0.1
 
 ## To-do
 
-* High Prio
+_High Prio_
 
 - Write tests
 - Production mode testing
 - Send invoice via mail
 - Update klarna-ruby for Klarna API 2.0
 
-*Completed*
+_Completed_
 
 - ~~Auto capture~~
 - ~~Send invoice via email~~
