@@ -22,14 +22,14 @@ class Spree::KlarnaPayment < ActiveRecord::Base
   
   # Activate action
   def capture(payment)
-    logger.debug "\n----------- KlarnaPayment.activate -----------\n"
+    logger.debug "\n----------- KlarnaPayment.capture -----------\n"
     logger.info "Country Code #{payment.payment_method.preferred(:country_code)}"
     logger.info "Store Id #{payment.payment_method.preferred(:store_id)}"
     logger.info "Store Secret #{payment.payment_method.preferred(:store_secret)}"
     payment.update_attribute(:state, 'pending') if payment.state == 'checkout' || payment.state == 'processing'
 
     begin
-      activate_invoice(payment) if payment.payment_method.preferred(:mode) != "test"
+      activate_invoice(payment) if payment.payment_method.preferred(:mode) != "test" && payment.payment_method.preferred(:activate_in_days) <= 0
       payment.complete
       true 
     rescue ::Klarna::API::Errors::KlarnaServiceError => e
@@ -93,6 +93,7 @@ class Spree::KlarnaPayment < ActiveRecord::Base
     # Add shipment cost
     #order_items << @@klarna.make_goods(1, I18n.t(:shipment), I18n.t(:shipment), payment.order.ship_total * 100.00, 25, nil, ::Klarna::API::GOODS[:INC_VAT])
     
+    # Add invoice fee
     order_items << @@klarna.make_goods(1, '', I18n.t(:invoice_fee), payment.payment_method.preferred(:invoice_fee) * 100.00, 25, nil, ::Klarna::API::GOODS[:INC_VAT]) if payment.payment_method.preferred(:invoice_fee) > 0
     
     # Create address
@@ -101,30 +102,41 @@ class Spree::KlarnaPayment < ActiveRecord::Base
     # Do transaction and create invoice in Klarna
     begin
       logger.debug "\n----------- add_transaction -----------\n"
-      shipping_cost = (payment.order.ship_total * 100) / 1.25
+      
+      shipping_cost = payment.order.ship_total * 100
+      shipping_cost = shipping_cost * (1 + Spree::TaxRate.default) if Spree::Config[:shipment_inc_vat]
+      
+      # Set flags
+      flags = {}
+      flags[:TEST_MODE] = TRUE unless payment.payment_method.preferred(:mode) == "live"
+      flags[:AUTO_ACTIVATE] = TRUE unless payment.payment_method.preferred(:activate_in_days)
+      
+      # Set ready date
+      ready_date = payment.payment_method.preferred(:activate_in_days) > 0 ? (DateTime.now.to_date + payment.payment_method.preferred(:activate_in_days)).to_s : nil
+
       invoice_no = @@klarna.add_transaction(
-          "USER-#{payment.order.user_id}",                            # store_user_id,
-          payment.order.number,                                       # order_id,
-          order_items,                                                # articles,
-          shipping_cost.to_i,                                         # shipping_fee,
-          0,                                                          # handling_fee,
-          :NORMAL,                                                    # shipment_type,
-          ssn,                                                        # pno,
-          payment.order.bill_address.firstname,                       # first_name,
-          payment.order.bill_address.lastname,                        # last_name,
-          address,                                                    # address,
-          '85.230.98.196',                                            # client_ip,
-          :SEK,           # currency, 
-          :SE,            # country, 
-          :SV,            # language, 
-          :SE)            # pno_encoding, 
-                          # pclass = nil, 
-                          # annual_salary = nil,
-                          # password = nil, 
-                          # ready_date = nil, 
-                          # comment = nil, 
-                          # rand_string = nil, 
-                          # flags = nil
+          "USER-#{payment.order.user_id}",                # store_user_id,
+          payment.order.number,                           # order_id,
+          order_items,                                    # articles,
+          shipping_cost.to_i,                             # shipping_fee,
+          0,                                              # handling_fee,
+          :NORMAL,                                        # shipment_type,
+          ssn,                                            # pno,
+          payment.order.bill_address.firstname,           # first_name,
+          payment.order.bill_address.lastname,            # last_name,
+          address,                                        # address,
+          payment.source.client_ip,                       # client_ip,
+          :SEK,                                           # currency, 
+          :SE,                                            # country, 
+          :SV,                                            # language, 
+          :SE,                                            # pno_encoding, 
+          nil,                                            # pclass = nil,
+          nil,                                            # annual_salary = nil,  
+          nil,                                            # password = nil,
+          ready_date,                                     # ready_date = nil,
+          nil,                                            # comment = nil, 
+          nil,                                            # rand_string = nil, 
+          flags)                                          # flags = nil
                                                                        
       logger.debug "\n----------- Invoice: #{invoice_no} -----------\n"                                                             
       self.update_attribute(:invoice_number, invoice_no)
@@ -138,14 +150,14 @@ class Spree::KlarnaPayment < ActiveRecord::Base
     logger.debug "\n----------- KlarnaPayment.activate_invoice -----------\n"
     init_klarna(payment)
     
-    raise Spree::Core::GatewayError.new(t(:mssing_invoice_number)) if self.invoice_number.blank?
+    raise Spree::Core::GatewayError.new(t(:missing_invoice_number)) if self.invoice_number.blank?
     
     @@klarna.activate_invoice(self.invoice_number)
     @@klarna.email_invoice(self.invoice_number)
   end
   
   def gateway_error(text)
-    msg = "#{I18n.t(:gateway_error)} ... #{text}"
+    msg = "#{text}"
     logger.error(msg)
     raise Spree::Core::GatewayError.new(msg)
   end
