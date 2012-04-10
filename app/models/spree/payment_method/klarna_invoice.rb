@@ -1,10 +1,10 @@
 class Spree::PaymentMethod::KlarnaInvoice < Spree::PaymentMethod
-  preference :country_code, :integer, :default => 'SE' 
-  preference :currency_code, :integer, :default => 'SEK'
-  preference :language_code, :integer, :default => 'SV'
-  preference :store_id, :integer
-  preference :store_secret, :string
-  preference :mode, :string, :default => :test
+  preference :country_code, :string, :default => 'SE' 
+  preference :currency_code, :string, :default => 'SEK'
+  preference :language_code, :string, :default => 'SV'
+  preference :store_id, :integer # 2029
+  preference :store_secret, :string # 3FPNSzybArL6vOg
+  preference :mode, :string, :default => :test # live
   preference :logging, :boolean, :default => true
   preference :http_logging, :boolean, :default => false
   preference :invoice_fee, :integer, :default => 70

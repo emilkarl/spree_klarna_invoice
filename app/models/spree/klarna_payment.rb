@@ -3,7 +3,7 @@ class Spree::KlarnaPayment < ActiveRecord::Base
 
   validates :social_security_number, :firstname, :lastname, :presence => true
   
-  attr_accessible :firstname, :lastname, :social_security_number, :invoice_number
+  attr_accessible :firstname, :lastname, :social_security_number, :invoice_number, :client_ip
   
   def actions
     %w{capture}
@@ -16,6 +16,7 @@ class Spree::KlarnaPayment < ActiveRecord::Base
 
   def process!(payment)
     logger.debug "\n----------- KlarnaPayment.process! -----------\n"
+    
     create_invoice(payment)
     capture(payment) if Spree::Config[:auto_capture]
   end
@@ -33,7 +34,7 @@ class Spree::KlarnaPayment < ActiveRecord::Base
       payment.complete
       true 
     rescue ::Klarna::API::Errors::KlarnaServiceError => e
-      gateway_error(e.error_message)
+      gateway_error("KlarnaPayment.process! >>> #{e.error_message}")
     end
   end
   
@@ -96,6 +97,14 @@ class Spree::KlarnaPayment < ActiveRecord::Base
     # Add invoice fee
     order_items << @@klarna.make_goods(1, '', I18n.t(:invoice_fee), payment.payment_method.preferred(:invoice_fee) * 100.00, 25, nil, ::Klarna::API::GOODS[:INC_VAT]) if payment.payment_method.preferred(:invoice_fee) > 0
     
+    payment.order.adjustments.eligible.each do |adjustment|
+      next if (adjustment.originator_type == 'Spree::TaxRate') and (adjustment.amount == 0)
+      
+      amount = 100 * adjustment.amount
+      order_items << @@klarna.make_goods(1, '', adjustment.label, amount, 25, nil, ::Klarna::API::GOODS[:INC_VAT])
+      
+    end
+    
     # Create address
     address = @@klarna.make_address("", payment.order.bill_address.address1, payment.order.bill_address.zipcode, payment.order.bill_address.city, payment.order.bill_address.country.iso, payment.order.bill_address.phone, nil, payment.order.email)
 
@@ -103,29 +112,38 @@ class Spree::KlarnaPayment < ActiveRecord::Base
     begin
       logger.debug "\n----------- add_transaction -----------\n"
       
-      shipping_cost = payment.order.ship_total * 100
-      shipping_cost = shipping_cost * (1 + Spree::TaxRate.default) if Spree::Config[:shipment_inc_vat]
+      #shipping_cost = payment.order.ship_total * 100
+      #shipping_cost = shipping_cost * (1 + Spree::TaxRate.default) if Spree::Config[:shipment_inc_vat]
       
-      # Set flags
-      flags = {}
-      flags[:TEST_MODE] = TRUE unless payment.payment_method.preferred(:mode) == "live"
-      flags[:AUTO_ACTIVATE] = TRUE unless payment.payment_method.preferred(:activate_in_days)
+      # Client IP
+      client_ip = payment.payment_method.preferred(:mode) == "test" ? "85.230.98.196" : payment.source.client_ip
       
       # Set ready date
       ready_date = payment.payment_method.preferred(:activate_in_days) > 0 ? (DateTime.now.to_date + payment.payment_method.preferred(:activate_in_days)).to_s : nil
-
+      
+      # Set flags
+      flags = {}
+      flags[:TEST_MODE] = TRUE # unless payment.payment_method.preferred(:mode) == "live"
+      flags[:AUTO_ACTIVATE] = TRUE # unless payment.payment_method.preferred(:activate_in_days)
+      
+      # Debug output
+      # logger.debug "\n----------- add_transaction - Shipping: #{shipping_cost.to_i} -----------\n"
+      logger.debug "\n----------- add_transaction - Ready date: #{ready_date} -----------\n"
+      logger.debug "\n----------- add_transaction - Flags: #{flags} -----------\n"
+      logger.debug "\n----------- add_transaction - Client IP: #{payment.source.client_ip} -----------\n"
+      
       invoice_no = @@klarna.add_transaction(
           "USER-#{payment.order.user_id}",                # store_user_id,
           payment.order.number,                           # order_id,
           order_items,                                    # articles,
-          shipping_cost.to_i,                             # shipping_fee,
+          0,                                              # shipping_fee,
           0,                                              # handling_fee,
           :NORMAL,                                        # shipment_type,
           ssn,                                            # pno,
           payment.order.bill_address.firstname,           # first_name,
           payment.order.bill_address.lastname,            # last_name,
           address,                                        # address,
-          payment.source.client_ip,                       # client_ip,
+          client_ip,                                      # client_ip,
           :SEK,                                           # currency, 
           :SE,                                            # country, 
           :SV,                                            # language, 
@@ -158,7 +176,7 @@ class Spree::KlarnaPayment < ActiveRecord::Base
   
   def gateway_error(text)
     msg = "#{text}"
-    logger.error(msg)
+    logger.error("KlarnaInvoice >>> #{msg}")
     raise Spree::Core::GatewayError.new(msg)
   end
 end

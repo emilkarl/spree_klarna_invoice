@@ -9,3 +9,4 @@
 &nbsp;</p>
 <%= hidden_field param_prefix, 'firstname', :value => @order.billing_firstname %>
 <%= hidden_field param_prefix, 'lastname', :value => @order.billing_lastname %>
+<%= hidden_field param_prefix, 'client_ip', :value => get_client_ip %>
