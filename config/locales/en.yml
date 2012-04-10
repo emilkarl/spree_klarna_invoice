@@ -2,7 +2,7 @@
 # See https://github.com/svenfuchs/rails-i18n/tree/master/rails%2Flocale for starting points.
 
 en:
-  sso: 'Social Security Number'
+  sso: 'Social Security Number (YYMMDD-XXXX)'
   invoice_fee_before: 'When paying with invoice an invoice fee will be applied at USD'
   invoice_fee_after: ''
   invoice_fee: 'Invoice fee'

@@ -1,5 +1,5 @@
 sv-SE:
-  sso: 'Personnummer'
+  sso: 'Personnummer (YYMMDD-XXXX)'
   invoice_fee_before: 'Vid betalsätt faktura tillkommer en kostnad på'
   invoice_fee_after: 'kr'
   invoice_fee: 'Fakturaavgift'
