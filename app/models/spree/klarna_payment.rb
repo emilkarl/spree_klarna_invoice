@@ -123,8 +123,8 @@ class Spree::KlarnaPayment < ActiveRecord::Base
       
       # Set flags
       flags = {}
-      flags[:TEST_MODE] = TRUE # unless payment.payment_method.preferred(:mode) == "live"
-      flags[:AUTO_ACTIVATE] = TRUE # unless payment.payment_method.preferred(:activate_in_days)
+      flags[:TEST_MODE] = TRUE unless payment.payment_method.preferred(:mode) == "production"
+      flags[:AUTO_ACTIVATE] = TRUE if payment.payment_method.preferred(:auto_activate)
       
       # Debug output
       # logger.debug "\n----------- add_transaction - Shipping: #{shipping_cost.to_i} -----------\n"
