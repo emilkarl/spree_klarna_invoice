@@ -90,13 +90,9 @@ class Spree::KlarnaPayment < ActiveRecord::Base
       logger.debug "\n----------- Item: #{item.quantity}, #{item.product.sku}, #{item.product.name}, #{item.amount} -----------\n"
       order_items << @@klarna.make_goods(item.quantity, item.product.sku, item.product.name, item.product.price * 100.00, 25, nil, ::Klarna::API::GOODS[:INC_VAT])
     end
+    
+    Spree::Adjustment.create(:source => self, :adjustable => payment.order, :amount => payment.payment_method.preferred(:invoice_fee), :label => I18n.t(:invoice_fee)) if payment.order.adjustments.klarna_invoice_cost.count <= 0
 
-    # Add shipment cost
-    #order_items << @@klarna.make_goods(1, I18n.t(:shipment), I18n.t(:shipment), payment.order.ship_total * 100.00, 25, nil, ::Klarna::API::GOODS[:INC_VAT])
-    
-    # Add invoice fee
-    order_items << @@klarna.make_goods(1, '', I18n.t(:invoice_fee), payment.payment_method.preferred(:invoice_fee) * 100.00, 25, nil, ::Klarna::API::GOODS[:INC_VAT]) if payment.payment_method.preferred(:invoice_fee) > 0
-    
     payment.order.adjustments.eligible.each do |adjustment|
       next if (adjustment.originator_type == 'Spree::TaxRate') and (adjustment.amount == 0)
       
@@ -171,7 +167,17 @@ class Spree::KlarnaPayment < ActiveRecord::Base
     raise Spree::Core::GatewayError.new(t(:missing_invoice_number)) if self.invoice_number.blank?
     
     @@klarna.activate_invoice(self.invoice_number)
-    @@klarna.email_invoice(self.invoice_number)
+    send_invoice(payment)
+  end
+  
+  def send_invoice(payment)
+    logger.debug "\n----------- KlarnaPayment.send_invoice -----------\n"
+    init_klarna(payment)
+    
+    raise Spree::Core::GatewayError.new(t(:missing_invoice_number)) if self.invoice_number.blank?
+  
+    @@klarna.email_invoice(self.invoice_number) if payment.payment_method.preferred(:email_invoice)
+    @@klarna.send_invoice(self.invoice_number) if payment.payment_method.preferred(:send_invoice)
   end
   
   def gateway_error(text)

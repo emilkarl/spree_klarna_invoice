@@ -6,3 +6,5 @@ en:
   invoice_fee_before: 'When paying with invoice an invoice fee will be applied at USD'
   invoice_fee_after: ''
   invoice_fee: 'Invoice fee'
+  email_invoice: 'Send invoice via email'
+  post_invoice: 'Send invoice via standard mail (additional costs may apply)'
