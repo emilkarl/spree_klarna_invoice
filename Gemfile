@@ -10,6 +10,6 @@ else
   gem "ruby-debug19"
 end
 
-gem 'klarna', :git => 'https://github.com/merchii/klarna-ruby.git'
+gem 'klarna'
 
 gemspec
