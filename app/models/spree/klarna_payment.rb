@@ -31,7 +31,8 @@ class Spree::KlarnaPayment < ActiveRecord::Base
 
     begin
       activate_invoice(payment) if payment.payment_method.preferred(:mode) != "test" && payment.payment_method.preferred(:activate_in_days) <= 0
-      payment.complete
+      payment.complete!
+      payment.order.update!
       true 
     rescue ::Klarna::API::Errors::KlarnaServiceError => e
       gateway_error("KlarnaPayment.process! >>> #{e.error_message}")
@@ -91,8 +92,12 @@ class Spree::KlarnaPayment < ActiveRecord::Base
       order_items << @@klarna.make_goods(item.quantity, item.product.sku, item.product.name, item.product.price * 100.00, 25, nil, ::Klarna::API::GOODS[:INC_VAT])
     end
     
-    Spree::Adjustment.create(:source => self, :adjustable => payment.order, :amount => payment.payment_method.preferred(:invoice_fee), :label => I18n.t(:invoice_fee)) if payment.order.adjustments.klarna_invoice_cost.count <= 0
-
+    if payment.order.adjustments.klarna_invoice_cost.count <= 0
+      Spree::Adjustment.create(:source => self, :adjustable => payment.order, :amount => payment.payment_method.preferred(:invoice_fee), :label => I18n.t(:invoice_fee)) 
+      payment.amount += payment.payment_method.preferred(:invoice_fee)
+      payment.order.update!
+    end
+    
     payment.order.adjustments.eligible.each do |adjustment|
       next if (adjustment.originator_type == 'Spree::TaxRate') and (adjustment.amount == 0)
       
