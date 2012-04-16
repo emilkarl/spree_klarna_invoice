@@ -107,7 +107,7 @@ class Spree::KlarnaPayment < ActiveRecord::Base
     end
     
     # Create address
-    address = @@klarna.make_address("", payment.order.bill_address.address1, payment.order.bill_address.zipcode, payment.order.bill_address.city, payment.order.bill_address.country.iso, payment.order.bill_address.phone, nil, payment.order.email)
+    address = @@klarna.make_address("", payment.order.bill_address.address1, payment.order.bill_address.zipcode.delete(' ').to_i, payment.order.bill_address.city, payment.order.bill_address.country.iso, payment.order.bill_address.phone, nil, payment.order.email)
 
     # Do transaction and create invoice in Klarna
     begin
