@@ -85,16 +85,23 @@ class Spree::KlarnaPayment < ActiveRecord::Base
     sso_secret = @@klarna.send(:digest, payment.payment_method.preferred(:store_id), ssn, payment.payment_method.preferred(:store_secret))
     logger.debug "\n----------- SSO Secret #{sso_secret} for #{ssn} -----------\n"
     order_items = []
-
+    
+    payment_amount = 0
+    
     # Add products
     payment.order.line_items.each do |item|
       logger.debug "\n----------- Item: #{item.quantity}, #{item.product.sku}, #{item.product.name}, #{item.amount} -----------\n"
       order_items << @@klarna.make_goods(item.quantity, item.product.sku, item.product.name, item.product.price * 100.00, 25, nil, ::Klarna::API::GOODS[:INC_VAT])
+      payment_amount += item.product.price
     end
     
     if payment.order.adjustments.klarna_invoice_cost.count <= 0
-      Spree::Adjustment.create(:source => self, :adjustable => payment.order, :amount => payment.payment_method.preferred(:invoice_fee), :label => I18n.t(:invoice_fee)) 
-      payment.amount += payment.payment_method.preferred(:invoice_fee)
+      payment.order.adjustments.create(:amount => payment.payment_method.preferred(:invoice_fee),
+                                :source => payment.order,
+                                :originator => self,
+                                :locked => true,
+                                :label => I18n.t(:invoice_fee))
+  
       payment.order.update!
     end
     
@@ -103,7 +110,7 @@ class Spree::KlarnaPayment < ActiveRecord::Base
       
       amount = 100 * adjustment.amount
       order_items << @@klarna.make_goods(1, '', adjustment.label, amount, 25, nil, ::Klarna::API::GOODS[:INC_VAT])
-      
+      payment_amount += adjustment.amount
     end
     
     # Create address
@@ -159,6 +166,8 @@ class Spree::KlarnaPayment < ActiveRecord::Base
                                                                        
       logger.debug "\n----------- Invoice: #{invoice_no} -----------\n"                                                             
       self.update_attribute(:invoice_number, invoice_no)
+      payment.update_attribute(:amount, payment_amount)
+      
     rescue ::Klarna::API::Errors::KlarnaServiceError => e
       gateway_error(e.error_message)
     end
