@@ -189,9 +189,16 @@ class Spree::KlarnaPayment < ActiveRecord::Base
     init_klarna(payment)
     
     raise Spree::Core::GatewayError.new(t(:missing_invoice_number)) if self.invoice_number.blank?
-  
-    @@klarna.email_invoice(self.invoice_number) if payment.payment_method.preferred(:email_invoice)
-    @@klarna.send_invoice(self.invoice_number) if payment.payment_method.preferred(:send_invoice)
+    
+    if payment.payment_method.preferred(:email_invoice)
+      logger.info "\n----------- KlarnaPayment.send_invoice : Email -----------\n"
+      @@klarna.email_invoice(self.invoice_number)
+    end
+    
+    if payment.payment_method.preferred(:send_invoice)
+      logger.info "\n----------- KlarnaPayment.send_invoice : Post -----------\n"
+      @@klarna.send_invoice(self.invoice_number)
+    end
   end
   
   def gateway_error(text)
