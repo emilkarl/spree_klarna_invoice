@@ -108,7 +108,7 @@ class Spree::KlarnaPayment < ActiveRecord::Base
     end
     
     payment.order.adjustments.eligible.each do |adjustment|
-      next if (adjustment.originator_type == 'Spree::TaxRate') or (adjustment.amount == 0)
+      next if (adjustment.originator_type == 'Spree::TaxRate') or (adjustment.amount === 0)
       
       amount = 100 * adjustment.amount
       order_items << @@klarna.make_goods(1, '', adjustment.label, amount, default_tax_rate.amount * 100, nil, default_tax_rate.included_in_price ? ::Klarna::API::GOODS[:INC_VAT] : nil)
@@ -154,7 +154,7 @@ class Spree::KlarnaPayment < ActiveRecord::Base
           0,                                                # handling_fee,
           :NORMAL,                                          # shipment_type,
           ssn,                                              # pno,
-          payment.order.bill_address.company.blank? ? payment.order.bill_address.firstname : payment.order.bill_address.firstname,           # first_name,
+          (payment.order.bill_address.company.blank? ? payment.order.bill_address.firstname : payment.order.bill_address.company), # first_name,
           payment.order.bill_address.lastname,              # last_name,
           address,                                          # address,
           client_ip,                                        # client_ip,
