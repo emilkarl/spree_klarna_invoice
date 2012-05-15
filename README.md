@@ -19,14 +19,14 @@ Built for Spree 1.0.1
 __High Prio__
 
 - Write tests
-- Production mode testing
-- Send invoice via mail
 - Update klarna-ruby for Klarna API 2.0
 
 __Completed__
 
 - ~~Auto capture~~
 - ~~Send invoice via email~~
+- ~~Send invoice via mail~~
+- ~~Production mode testing~~
 
 ## License
 

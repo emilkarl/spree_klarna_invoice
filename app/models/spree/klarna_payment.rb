@@ -87,11 +87,13 @@ class Spree::KlarnaPayment < ActiveRecord::Base
     order_items = []
     
     payment_amount = 0
+   
+    default_tax_rate = Spree::TaxRate.find(1)
     
     # Add products
     payment.order.line_items.each do |item|
       logger.debug "\n----------- Item: #{item.quantity}, #{item.product.sku}, #{item.product.name}, #{item.amount} -----------\n"
-      order_items << @@klarna.make_goods(item.quantity, item.product.sku, item.product.name, item.product.price * 100.00, 25, nil, ::Klarna::API::GOODS[:INC_VAT])
+      order_items << @@klarna.make_goods(item.quantity, item.product.sku, item.product.name, item.product.price * 100.00, default_tax_rate.amount*100, nil, default_tax_rate.included_in_price ? ::Klarna::API::GOODS[:INC_VAT] : nil)
       payment_amount += item.product.price
     end
     
@@ -106,10 +108,10 @@ class Spree::KlarnaPayment < ActiveRecord::Base
     end
     
     payment.order.adjustments.eligible.each do |adjustment|
-      next if (adjustment.originator_type == 'Spree::TaxRate') and (adjustment.amount == 0)
+      next if (adjustment.originator_type == 'Spree::TaxRate') or (adjustment.amount == 0)
       
       amount = 100 * adjustment.amount
-      order_items << @@klarna.make_goods(1, '', adjustment.label, amount, 25, nil, ::Klarna::API::GOODS[:INC_VAT])
+      order_items << @@klarna.make_goods(1, '', adjustment.label, amount, default_tax_rate.amount * 100, nil, default_tax_rate.included_in_price ? ::Klarna::API::GOODS[:INC_VAT] : nil)
       payment_amount += adjustment.amount
     end
     
@@ -140,29 +142,33 @@ class Spree::KlarnaPayment < ActiveRecord::Base
       logger.debug "\n----------- add_transaction - Flags: #{flags} -----------\n"
       logger.debug "\n----------- add_transaction - Client IP: #{payment.source.client_ip} -----------\n"
       
+      
+      
+      
+      
       invoice_no = @@klarna.add_transaction(
-          "USER-#{payment.order.user_id}",                # store_user_id,
-          payment.order.number,                           # order_id,
-          order_items,                                    # articles,
-          0,                                              # shipping_fee,
-          0,                                              # handling_fee,
-          :NORMAL,                                        # shipment_type,
-          ssn,                                            # pno,
-          payment.order.bill_address.firstname,           # first_name,
-          payment.order.bill_address.lastname,            # last_name,
-          address,                                        # address,
-          client_ip,                                      # client_ip,
-          :SEK,                                           # currency, 
-          :SE,                                            # country, 
-          :SV,                                            # language, 
-          :SE,                                            # pno_encoding, 
-          nil,                                            # pclass = nil,
-          nil,                                            # annual_salary = nil,  
-          nil,                                            # password = nil,
-          ready_date,                                     # ready_date = nil,
-          nil,                                            # comment = nil, 
-          nil,                                            # rand_string = nil, 
-          flags)                                          # flags = nil
+          "USER-#{payment.order.user_id}",                  # store_user_id,
+          payment.order.number,                             # order_id,
+          order_items,                                      # articles,
+          0,                                                # shipping_fee,
+          0,                                                # handling_fee,
+          :NORMAL,                                          # shipment_type,
+          ssn,                                              # pno,
+          payment.order.bill_address.company.blank? ? payment.order.bill_address.firstname : payment.order.bill_address.firstname,           # first_name,
+          payment.order.bill_address.lastname,              # last_name,
+          address,                                          # address,
+          client_ip,                                        # client_ip,
+          payment.payment_method.preferred(:currency_code), # currency, 
+          payment.payment_method.preferred(:country_code),  # country, 
+          payment.payment_method.preferred(:language_code), # language, 
+          payment.payment_method.preferred(:country_code),  # pno_encoding, 
+          nil,                                              # pclass = nil,
+          nil,                                              # annual_salary = nil,  
+          nil,                                              # password = nil,
+          ready_date,                                       # ready_date = nil,
+          nil,                                              # comment = nil, 
+          nil,                                              # rand_string = nil, 
+          flags)                                            # flags = nil
                                                                        
       logger.debug "\n----------- Invoice: #{invoice_no} -----------\n"                                                             
       self.update_attribute(:invoice_number, invoice_no)
