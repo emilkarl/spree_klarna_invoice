@@ -35,6 +35,7 @@ class Spree::KlarnaPayment < ActiveRecord::Base
       payment.order.update!
       true 
     rescue ::Klarna::API::Errors::KlarnaServiceError => e
+      payment.order.set_error e.error_message
       gateway_error("KlarnaPayment.process! >>> #{e.error_message}")
     end
   end
@@ -63,8 +64,10 @@ class Spree::KlarnaPayment < ActiveRecord::Base
     begin
       return ::Klarna::API::Client.new(::Klarna.store_id, ::Klarna.store_secret)
     rescue Klarna::API::Errors::KlarnaCredentialsError => e
+      payment.order.set_error e.error_message
       gateway_error(e.error_message)
     rescue ::Klarna::API::Errors::KlarnaServiceError => e
+      payment.order.set_error e.error_message
       gateway_error(e.error_message)
     end
   end
@@ -175,6 +178,7 @@ class Spree::KlarnaPayment < ActiveRecord::Base
       payment.update_attribute(:amount, payment_amount)
       
     rescue ::Klarna::API::Errors::KlarnaServiceError => e
+      payment.order.set_error e.error_message
       gateway_error(e.error_message)
     end
   end
