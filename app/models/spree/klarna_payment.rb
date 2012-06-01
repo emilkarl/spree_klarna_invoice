@@ -173,7 +173,7 @@ class Spree::KlarnaPayment < ActiveRecord::Base
           nil,                                              # rand_string = nil, 
           flags)                                            # flags = nil
                                                                        
-      logger.debug "\n----------- Invoice: #{invoice_no} -----------\n"                                                             
+      logger.info "\n----------- Order: #{payment.order.number} (#{payment.order.id}) | Invoice: #{invoice_no} -----------\n"                                                             
       self.update_attribute(:invoice_number, invoice_no)
       payment.update_attribute(:amount, payment_amount)
       
