@@ -98,6 +98,11 @@ class Spree::KlarnaPayment < ActiveRecord::Base
     payment.order.line_items.each do |item|
       logger.debug "\n----------- Item: #{item.quantity}, #{item.product.sku}, #{item.product.name}, #{item.amount} -----------\n"
       order_items << @@klarna.make_goods(item.quantity, item.product.sku, item.product.name, item.product.price * 100.00, default_tax_rate.amount*100, nil, default_tax_rate.included_in_price ? ::Klarna::API::GOODS[:INC_VAT] : nil)
+      
+      if ! default_tax_rate.included_in_price
+        item.product.price = item.product.price * (default_tax_rate.amount + 1)
+      end
+      
       payment_amount += item.product.price
     end
     
@@ -116,7 +121,13 @@ class Spree::KlarnaPayment < ActiveRecord::Base
       
       amount = 100 * adjustment.amount
       order_items << @@klarna.make_goods(1, '', adjustment.label, amount, default_tax_rate.amount * 100, nil, default_tax_rate.included_in_price ? ::Klarna::API::GOODS[:INC_VAT] : nil)
+      
+      if ! default_tax_rate.included_in_price
+        adjustment.amount = adjustment.amount * (default_tax_rate.amount + 1)
+      end
+      
       payment_amount += adjustment.amount
+      logger.info "\n----------- Order: #{payment.order.number} (#{payment.order.id}) | payment_amount: #{payment_amount} -----------\n"   
     end
     
     # Create address
@@ -146,10 +157,6 @@ class Spree::KlarnaPayment < ActiveRecord::Base
       logger.debug "\n----------- add_transaction - Flags: #{flags} -----------\n"
       logger.debug "\n----------- add_transaction - Client IP: #{payment.source.client_ip} -----------\n"
       
-      
-      
-      
-      
       invoice_no = @@klarna.add_transaction(
           "USER-#{payment.order.user_id}",                  # store_user_id,
           payment.order.number,                             # order_id,
@@ -174,7 +181,8 @@ class Spree::KlarnaPayment < ActiveRecord::Base
           nil,                                              # rand_string = nil, 
           flags)                                            # flags = nil
                                                                        
-      logger.info "\n----------- Order: #{payment.order.number} (#{payment.order.id}) | Invoice: #{invoice_no} -----------\n"                                                             
+      logger.info "\n----------- Order: #{payment.order.number} (#{payment.order.id}) | Invoice: #{invoice_no} -----------\n"         
+      logger.info "\n----------- Order: #{payment.order.number} (#{payment.order.id}) | payment_amount: #{payment_amount} -----------\n"                                                           
       self.update_attribute(:invoice_number, invoice_no)
       payment.update_attribute(:amount, payment_amount)
       
