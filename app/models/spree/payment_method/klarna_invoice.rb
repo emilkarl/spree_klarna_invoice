@@ -12,6 +12,7 @@ class Spree::PaymentMethod::KlarnaInvoice < Spree::PaymentMethod
   preference :language_code, :string, :default => 'SV'
   preference :logging, :boolean, :default => true
   preference :http_logging, :boolean, :default => false
+  preference :timeout, :integer, :default => 10
   
   def source_required?
     true
