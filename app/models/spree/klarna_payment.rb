@@ -45,6 +45,7 @@ class Spree::KlarnaPayment < ActiveRecord::Base
   # Init Klarna instance
   def init_klarna(payment)
     @@klarna ||= setup_klarna(payment)
+    @@klarna.timeout = payment.payment_method.preferred(:timeout) unless payment.payment_method.preferred(:timeout) <= 0
   end
   
   # Setup Klarna connection
@@ -59,7 +60,6 @@ class Spree::KlarnaPayment < ActiveRecord::Base
       config.store_secret = payment.payment_method.preferred(:store_secret) # '3FPNSzybArL6vOg'
       config.logging = payment.payment_method.preferred(:logging)
       config.http_logging = payment.payment_method.preferred(:http_logging)
-      config.timeout = payment.payment_method.preferred(:timeout)
     end
 
     begin
