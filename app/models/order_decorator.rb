@@ -4,6 +4,6 @@ Spree::Order.class_eval do
   end
   
   def get_error
-    @@e_message.blank? ? I18n.t(:payment_processing_failed) : @@e_message
+    (@@e_message.nil? || @@e_message.blank?) ? I18n.t(:payment_processing_failed) : @@e_message
   end
 end
