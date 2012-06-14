@@ -21,6 +21,10 @@ class Spree::PaymentMethod::KlarnaInvoice < Spree::PaymentMethod
   def payment_source_class
     Spree::KlarnaPayment
   end
+  
+  def payment_profiles_supported?
+    true
+  end
 end
 
 

@@ -106,16 +106,6 @@ class Spree::KlarnaPayment < ActiveRecord::Base
       payment_amount += item.product.price
     end
     
-    if payment.order.adjustments.klarna_invoice_cost.count <= 0
-      payment.order.adjustments.create(:amount => payment.payment_method.preferred(:invoice_fee),
-                                :source => payment.order,
-                                :originator => self,
-                                :locked => true,
-                                :label => I18n.t(:invoice_fee))
-  
-      payment.order.update!
-    end
-    
     payment.order.adjustments.eligible.each do |adjustment|
       next if (adjustment.originator_type == 'Spree::TaxRate') or (adjustment.amount === 0)
       

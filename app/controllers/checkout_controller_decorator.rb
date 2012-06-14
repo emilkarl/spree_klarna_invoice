@@ -19,8 +19,18 @@ Spree::CheckoutController.class_eval do
         end
       end
       # Promo ends
+      
+      if @order.adjustments.klarna_invoice_cost.count <= 0 && @order.payment.payment_method && @order.payment.payment_method.class.name == 'Spree::PaymentMethod::KlarnaInvoice'
+        @order.adjustments.create(:amount => @order.payment.payment_method.preferred(:invoice_fee),
+                                  :source => @order,
+                                  :originator => @order.payment.payment_method,
+                                  :locked => true,
+                                  :label => I18n.t(:invoice_fee))
+
+        @order.update!
+      end
        
-      if @order.next
+      if @order.next        
         state_callback(:after)
       else
         flash[:error] = @order.get_error 
