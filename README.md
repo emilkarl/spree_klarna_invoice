@@ -32,4 +32,4 @@ __Completed__
 
 Released under the MIT license.
 
-Copyright (c) 2012 [Emil Karlsson]([http://emilkarl.se), [Noc Webbyrå](http://nocweb.se)
+Copyright &copy; 2012 [Emil Karlsson]([http://emilkarl.se), [Noc Webbyrå](http://nocweb.se)
