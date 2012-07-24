@@ -20,6 +20,7 @@ Spree::CheckoutController.class_eval do
       end
       # Promo ends
       
+      # Add Klarna invoice cost
       if !@order.payment.nil? && @order.adjustments.klarna_invoice_cost.count <= 0 && @order.payment.payment_method && @order.payment.payment_method.class.name == 'Spree::PaymentMethod::KlarnaInvoice'
         @order.adjustments.create(:amount => @order.payment.payment_method.preferred(:invoice_fee),
                                   :source => @order,
@@ -27,6 +28,12 @@ Spree::CheckoutController.class_eval do
                                   :locked => true,
                                   :label => I18n.t(:invoice_fee))
 
+        @order.update!
+      end
+      
+      # Remove Klarna invoice cost
+      if !@order.payment.nil? && @order.adjustments.klarna_invoice_cost.count > 0 && @order.payment.payment_method && @order.payment.payment_method.class.name != 'Spree::PaymentMethod::KlarnaInvoice'
+        @order.adjustments.klarna_invoice_cost.destroy_all
         @order.update!
       end
        
