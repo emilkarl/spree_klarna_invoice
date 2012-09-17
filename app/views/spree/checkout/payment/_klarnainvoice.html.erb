@@ -1,6 +1,6 @@
 <%= image_tag '/assets/store/klarna.gif', :id => 'klarna-image' %>
 <% param_prefix = "payment_source[#{payment_method.id}]" %>
-<p><%= "#{I18n.t(:invoice_fee_before)} #{Spree::PaymentMethod::KlarnaInvoice.new.preferred(:invoice_fee)} #{I18n.t(:invoice_fee_after)}" %></p>
+<p><%= "#{I18n.t(:invoice_fee_before)} #{Spree::PaymentMethod::KlarnaInvoice.first.preferred(:invoice_fee)} #{I18n.t(:invoice_fee_after)}" %></p>
 <p class="field" data-hook="sso">
   <%= label_tag nil, I18n.t(:sso) %><br />
   <% options_hash = Rails.env.production? ? {:autocomplete => 'off'} : {} %>
@@ -23,11 +23,11 @@
       ssn.parent().children('label.error').remove();
 
       if(ssn.length === 1){
-        if(ssn_val.length >= <%= Spree::PaymentMethod::KlarnaInvoice.new.preferred(:pnr_min) %> && ssh_val.length <= <%= Spree::PaymentMethod::KlarnaInvoice.new.preferred(:pnr_max) %>){
+        if(ssn_val.length >= <%= Spree::PaymentMethod::KlarnaInvoice.first.preferred(:pnr_min) %> && ssh_val.length <= <%= Spree::PaymentMethod::KlarnaInvoice.first.preferred(:pnr_max) %>){
           return true;
         } else {
           ssn.addClass('error');
-          ssn.parent().append('<label for="social_security_number" class="error" generated="true"><%= pnr_validation_error(Spree::PaymentMethod::KlarnaInvoice.new.preferred(:pnr_min), Spree::PaymentMethod::KlarnaInvoice.new.preferred(:pnr_max)) %></label>');
+          ssn.parent().append('<label for="social_security_number" class="error" generated="true"><%= pnr_validation_error(Spree::PaymentMethod::KlarnaInvoice.first.preferred(:pnr_min), Spree::PaymentMethod::KlarnaInvoice.first.preferred(:pnr_max)) %></label>');
           $("#checkout_form_payment").find(':submit, :image').attr('disabled', false).addClass('primary').removeClass('disabled');
           return false;
         }

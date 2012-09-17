@@ -5,9 +5,9 @@ Spree::BaseHelper.class_eval do
   
   def pnr_validation_error(min, max)
     if(min != max) 
-      "#{I18n.t(:pnr_validation_first)} #{I18n.t(:between)} #{Spree::PaymentMethod::KlarnaInvoice.new.preferred(:pnr_min)} #{I18n.t(:and)} #{Spree::PaymentMethod::KlarnaInvoice.new.preferred(:pnr_max)} #{I18n.t(:chars)}. #{I18n.t(:pnr_formats)} #{Spree::PaymentMethod::KlarnaInvoice.new.preferred(:pnr_formats)}"
+      "#{I18n.t(:pnr_validation_first)} #{I18n.t(:between)} #{Spree::PaymentMethod::KlarnaInvoice.first.preferred(:pnr_min)} #{I18n.t(:and)} #{Spree::PaymentMethod::KlarnaInvoice.first.preferred(:pnr_max)} #{I18n.t(:chars)}. #{I18n.t(:pnr_formats)} #{Spree::PaymentMethod::KlarnaInvoice.first.preferred(:pnr_formats)}"
     else
-      "#{I18n.t(:pnr_validation_first)} #{Spree::PaymentMethod::KlarnaInvoice.new.preferred(:pnr_min)} #{I18n.t(:chars)}. #{I18n.t(:pnr_formats)} #{Spree::PaymentMethod::KlarnaInvoice.new.preferred(:pnr_formats)}"
+      "#{I18n.t(:pnr_validation_first)} #{Spree::PaymentMethod::KlarnaInvoice.first.preferred(:pnr_min)} #{I18n.t(:chars)}. #{I18n.t(:pnr_formats)} #{Spree::PaymentMethod::KlarnaInvoice.first.preferred(:pnr_formats)}"
     end
   end
 end
