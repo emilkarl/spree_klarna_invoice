@@ -2,7 +2,7 @@
 <% param_prefix = "payment_source[#{payment_method.id}]" %>
 <p><%= "#{I18n.t(:invoice_fee_before)} #{Spree::PaymentMethod::KlarnaInvoice.new.preferred(:invoice_fee)} #{I18n.t(:invoice_fee_after)}" %></p>
 <p class="field" data-hook="sso">
-  <%= label_tag nil, t(:sso) %><br />
+  <%= label_tag nil, I18n.t(:sso) %><br />
   <% options_hash = Rails.env.production? ? {:autocomplete => 'off'} : {} %>
   <%= text_field_tag "#{param_prefix}[social_security_number]", '', options_hash.merge(:id => 'social_security_number', :class => 'required', :size => 12, :maxlength => 12) %>
 <span class="req">*</span>
@@ -10,3 +10,31 @@
 <%= hidden_field param_prefix, 'firstname', :value => @order.billing_firstname %>
 <%= hidden_field param_prefix, 'lastname', :value => @order.billing_lastname %>
 <%= hidden_field param_prefix, 'client_ip', :value => get_client_ip %>
+
+<script type="text/javascript" charset="utf-8">
+  $(document).ready(function(){
+    // Validate pnr
+    $("#checkout_form_payment").submit(function(){
+      var payment_method_id = $("input[name='order[payments_attributes][][payment_method_id]']:checked").val();
+      var ssn = $("#payment_method_" + payment_method_id + " #social_security_number");
+      var ssn_val = ssn.val();
+
+      ssn.removeClass('error');
+      ssn.parent().children('label.error').remove();
+
+      if(ssn.length === 1){
+        if(ssn_val.length >= <%= Spree::PaymentMethod::KlarnaInvoice.new.preferred(:pnr_min) %> && ssh_val.length <= <%= Spree::PaymentMethod::KlarnaInvoice.new.preferred(:pnr_max) %>){
+          return true;
+        } else {
+          ssn.addClass('error');
+          ssn.parent().append('<label for="social_security_number" class="error" generated="true"><%= pnr_validation_error(Spree::PaymentMethod::KlarnaInvoice.new.preferred(:pnr_min), Spree::PaymentMethod::KlarnaInvoice.new.preferred(:pnr_max)) %></label>');
+          $("#checkout_form_payment").find(':submit, :image').attr('disabled', false).addClass('primary').removeClass('disabled');
+          return false;
+        }
+      }
+
+      return true;
+    });
+  });
+  
+</script>

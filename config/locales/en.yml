@@ -8,3 +8,7 @@ en:
   invoice_fee: 'Invoice fee'
   email_invoice: 'Send invoice via email'
   post_invoice: 'Send invoice via standard mail (additional costs may apply)'
+  pnr_validation_first: 'Social security number must me'
+  pnr_formats: 'In any of these formats'
+  between: 'between'
+  chars: 'characters'
