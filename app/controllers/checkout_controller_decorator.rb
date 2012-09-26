@@ -28,6 +28,8 @@ Spree::CheckoutController.class_eval do
                                   :locked => true,
                                   :label => I18n.t(:invoice_fee))
 
+        @order.update_adjustment_tax
+        
         @order.update!
       end
       
