@@ -1,4 +1,4 @@
-<%= image_tag '/assets/store/klarna.gif', :id => 'klarna-image' %>
+<%= image_tag "https://cdn.klarna.com/public/images/#{Spree::PaymentMethod::KlarnaInvoice.first.preferred(:country_code)}/badges/v1/invoice/#{Spree::PaymentMethod::KlarnaInvoice.first.preferred(:country_code)}_invoice_badge_banner_blue.png?width=85&eid=#{Spree::PaymentMethod::KlarnaInvoice.first.preferred(:store_id)}", :id => 'klarna-image' %>
 <% param_prefix = "payment_source[#{payment_method.id}]" %>
 <p><%= "#{I18n.t(:invoice_fee_before)} #{Spree::PaymentMethod::KlarnaInvoice.first.preferred(:invoice_fee)} #{I18n.t(:invoice_fee_after)}" %></p>
 <p class="field" data-hook="sso">
