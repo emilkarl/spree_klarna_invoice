@@ -97,7 +97,9 @@ class Spree::KlarnaPayment < ActiveRecord::Base
     # Add products
     payment.order.line_items.each do |item|
       logger.debug "\n----------- Item: #{item.quantity}, #{item.product.sku}, #{item.product.name}, #{item.amount} -----------\n"
-      order_items << @@klarna.make_goods(item.quantity, item.product.sku, item.product.name, item.product.price * 100.00, default_tax_rate.amount*100, nil, default_tax_rate.included_in_price ? ::Klarna::API::GOODS[:INC_VAT] : nil)
+      flags = {}
+      flags[:INC_VAT] = ::Klarna::API::GOODS[:INC_VAT] if default_tax_rate.included_in_price
+      order_items << @@klarna.make_goods(item.quantity, item.product.sku, item.product.name, item.product.price * 100.00, default_tax_rate.amount*100, nil, flags)
       
       if ! default_tax_rate.included_in_price
         item.product.price = item.product.price * (default_tax_rate.amount + 1)
@@ -109,8 +111,12 @@ class Spree::KlarnaPayment < ActiveRecord::Base
     payment.order.adjustments.eligible.each do |adjustment|
       next if (adjustment.originator_type == 'Spree::TaxRate') or (adjustment.amount === 0)
       
+      flags = {}
+      flags[:INC_VAT] = ::Klarna::API::GOODS[:INC_VAT] if default_tax_rate.included_in_price
+      flags[:IS_HANDLING] = ::Klarna::API::GOODS[:IS_HANDLING] if adjustment.label == I18n.t(:invoice_fee)
+      flags[:IS_SHIPMENT] = ::Klarna::API::GOODS[:IS_SHIPMENT] if adjustment.originator_type == 'Spree::ShippingMethod'
       amount = 100 * adjustment.amount
-      order_items << @@klarna.make_goods(1, '', adjustment.label, amount, default_tax_rate.amount * 100, nil, default_tax_rate.included_in_price ? ::Klarna::API::GOODS[:INC_VAT] : nil)
+      order_items << @@klarna.make_goods(1, '', adjustment.label, amount, default_tax_rate.amount * 100, nil, flags)
       
       if ! default_tax_rate.included_in_price
         adjustment.amount = adjustment.amount * (default_tax_rate.amount + 1)
