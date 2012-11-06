@@ -17,8 +17,13 @@ class Spree::KlarnaPayment < ActiveRecord::Base
   def process!(payment)
     logger.debug "\n----------- KlarnaPayment.process! -----------\n"
     
-    create_invoice(payment)
-    capture(payment) if Spree::Config[:auto_capture]
+    if self.invoice_number.blank? 
+      create_invoice(payment)
+    else
+      logger.error "\n----------- KlarnaPayment.process! -> Order Exists in Klarna with no: #{self.invoice_number} | Order: #{payment.order.number} (#{payment.order.id}) -----------\n" 
+    end
+    
+    capture(payment) if Spree::Config[:auto_capture] && !self.invoice_number.blank?
   end
   
   # Activate action
