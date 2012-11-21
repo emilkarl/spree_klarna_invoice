@@ -45,7 +45,7 @@ Spree::CheckoutController.class_eval do
       if @order.next
         state_callback(:after)
       else
-        flash[:error] = t(:payment_processing_failed)
+        flash[:error] = @order.get_error
         respond_with(@order, :location => checkout_state_path(@order.state))
         return
       end
