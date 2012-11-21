@@ -6,11 +6,14 @@ Spree::CheckoutController.class_eval do
     if @order.update_attributes(object_params)
       fire_event('spree.checkout.update')
       
-      # Promo starts
+      # Promo
+      logger.info "---------------------------------"
+      logger.info "Check promo"
       if @order.coupon_code.present?
-
-        if Spree::Promotion.exists?(:code => @order.coupon_code)
-          fire_event('spree.checkout.coupon_code_added', :coupon_code => @order.coupon_code)
+        logger.info "Promot: #{@order.coupon_code}"
+        event_name = "spree.checkout.coupon_code_added"
+        if promo = Spree::Promotion.with_coupon_code(@order.coupon_code).where(:event_name => event_name).first
+          fire_event(event_name, :coupon_code => @order.coupon_code)
           # If it doesn't exist, raise an error!
           # Giving them another chance to enter a valid coupon code
         else
@@ -18,7 +21,7 @@ Spree::CheckoutController.class_eval do
           render :edit and return
         end
       end
-      # Promo ends
+      logger.info "---------------------------------"
       
       # Add Klarna invoice cost
       if !@order.payment.nil? && @order.adjustments.klarna_invoice_cost.count <= 0 && @order.payment.payment_method && @order.payment.payment_method.class.name == 'Spree::PaymentMethod::KlarnaInvoice'
@@ -38,11 +41,11 @@ Spree::CheckoutController.class_eval do
         @order.adjustments.klarna_invoice_cost.destroy_all
         @order.update!
       end
-       
-      if @order.next        
+      
+      if @order.next
         state_callback(:after)
       else
-        flash[:error] = @order.get_error 
+        flash[:error] = t(:payment_processing_failed)
         respond_with(@order, :location => checkout_state_path(@order.state))
         return
       end

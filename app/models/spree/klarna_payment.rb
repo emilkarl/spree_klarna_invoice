@@ -14,8 +14,10 @@ class Spree::KlarnaPayment < ActiveRecord::Base
     ['checkout', 'pending', 'processing'].include?(payment.state) && !payment.order.klarna_invoice_number.blank?
   end
 
-  def process!(payment)
+  def process!
     logger.debug "\n----------- KlarnaPayment.process! -----------\n"
+    
+    payment = self.payments.first
     
     if self.invoice_number.blank? 
       create_invoice(payment)
@@ -23,7 +25,9 @@ class Spree::KlarnaPayment < ActiveRecord::Base
       logger.error "\n----------- KlarnaPayment.process! -> Order Exists in Klarna with no: #{self.invoice_number} | Order: #{payment.order.number} (#{payment.order.id}) -----------\n" 
     end
     
-    capture(payment) if Spree::Config[:auto_capture] && !self.invoice_number.blank?
+    return capture(payment) if Spree::Config[:auto_capture] && !self.invoice_number.blank?
+    
+    return ActiveMerchant::Billing::Response.new(true, 'Klarna Payment : Created invoice without capture', {})
   end
   
   # Activate action
@@ -38,10 +42,11 @@ class Spree::KlarnaPayment < ActiveRecord::Base
       activate_invoice(payment) if payment.payment_method.preferred(:mode) != "test" && payment.payment_method.preferred(:activate_in_days) <= 0
       payment.complete!
       payment.order.update!
-      true 
+      ActiveMerchant::Billing::Response.new(true, 'Klarna Payment : Success', {})
     rescue ::Klarna::API::Errors::KlarnaServiceError => e
       payment.order.set_error e.error_message
       gateway_error("KlarnaPayment.process! >>> #{e.error_message}")
+      ActiveMerchant::Billing::Response.new(false, 'Klarna Payment : Could not capture', {})
     end
   end
   

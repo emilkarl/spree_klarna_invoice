@@ -30,6 +30,10 @@ class Spree::PaymentMethod::KlarnaInvoice < Spree::PaymentMethod
   def payment_profiles_supported?
     true
   end
+  
+  def purchase(money, payment_source, options = {})
+    return payment_source.process!
+  end
 end
 
 
