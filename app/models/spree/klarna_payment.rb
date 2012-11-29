@@ -6,14 +6,25 @@ class Spree::KlarnaPayment < ActiveRecord::Base
   attr_accessible :firstname, :lastname, :social_security_number, :invoice_number, :client_ip
   
   def actions
-    %w{capture}
+    %w{capture recreate}
   end
 
   # Indicates whether its possible to capture the payment
   def can_capture?(payment)
-    ['checkout', 'pending', 'processing'].include?(payment.state) && !payment.order.klarna_invoice_number.blank?
+    ['checkout', 'pending', 'processing'].include?(payment.state) && !self.invoice_number.blank?
   end
-
+  
+  # Indicates whether its possible to capture the payment
+  def can_recreate?(payment)
+    ['checkout', 'pending', 'processing'].include?(payment.state) && self.invoice_number.blank?
+  end
+  
+  
+  def recreate(payment)
+    response = self.process!(payment)
+    payment.order.next
+  end
+  
   def process!(payment)
     logger.debug "\n----------- KlarnaPayment.process! -----------\n"
     

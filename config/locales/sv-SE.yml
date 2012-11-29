@@ -9,3 +9,4 @@ sv-SE:
   between: 'mellan'
   chars: 'tecken'
   pnr_formats: 'I något av dessa format'
+  recreate: Skapa ny och godkänn
