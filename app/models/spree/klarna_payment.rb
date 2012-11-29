@@ -16,12 +16,11 @@ class Spree::KlarnaPayment < ActiveRecord::Base
   
   # Indicates whether its possible to capture the payment
   def can_recreate?(payment)
-    ['checkout', 'pending', 'processing'].include?(payment.state) && self.invoice_number.blank?
+    ['checkout', 'pending', 'processing'].include?(payment.state) && ['delivery', 'payment', 'confirm'].include?(payment.order.state) && self.invoice_number.blank?
   end
   
   
   def recreate(payment)
-    response = self.process!(payment)
     payment.order.next
   end
   
