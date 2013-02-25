@@ -1,0 +1,6 @@
+<% if @order.state == 'address' && Spree::PaymentMethod::KlarnaInvoice.active?  %>
+  <div id="invoice-info" class='columns omega five'>
+    <h3><%= t(:invoice_info) %><%= image_tag "https://cdn.klarna.com/public/images/#{Spree::PaymentMethod::KlarnaInvoice.first.preferred(:country_code)}/badges/v1/basic/#{Spree::PaymentMethod::KlarnaInvoice.first.preferred(:country_code)}_basic_badge_std_blue.png?width=55&eid=#{Spree::PaymentMethod::KlarnaInvoice.first.preferred(:store_id)}", :id => 'klarna-image' %></h3>
+    <p><%= t(:invoice_info_text) %></p>
+  </div>
+<% end %>
