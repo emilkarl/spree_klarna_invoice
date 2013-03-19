@@ -1,4 +1,4 @@
-nn:
+nb-NO:
   sso: 'Person- eller org.nr.'
   invoice_fee_before: 'Ved valg av faktura tilkommer et fakturatillegg på NOK'
   invoice_fee_after: '.'

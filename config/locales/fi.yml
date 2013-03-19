@@ -1,0 +1,11 @@
+fi:
+  sso: 'Sosiaaliturvatunnus (VVKKPP-XXXX)'
+  invoice_fee_before: 'Maksaessasi laskun laskun maksua sovelletaan Yhdysvaltain dollaria'
+  invoice_fee_after: ''
+  invoice_fee: 'laskun maksu'
+  email_invoice: 'Lähetä lasku sähköpostitse'
+  post_invoice: 'Lähetä lasku tavallisella postilla (lisämaksu voidaan soveltaa)'
+  pnr_validation_first: 'Henkilötunnus on'
+  pnr_formats: 'Missä tahansa näistä muodoissa'
+  between: 'välillä'
+  chars: 'merkit'

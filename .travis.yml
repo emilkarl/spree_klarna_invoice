@@ -1,0 +1,12 @@
+language: ruby
+rvm:
+  - 2.0.0
+  - 1.9.3
+  - jruby-19mode
+  - rbx-19mode
+  - ruby-head
+  - jruby-head
+  - ree
+before_script:
+  - "bundle exec rake test_app"
+script: "bundle exec rspec spec"
