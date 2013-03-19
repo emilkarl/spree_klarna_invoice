@@ -1,11 +1,11 @@
 Spree::CheckoutController.class_eval do
   before_filter :set_klarna_client_ip, :only => [:update]
-  
+
   # Updates the order and advances to the next state (when possible.)
   def update
     if @order.update_attributes(object_params)
       fire_event('spree.checkout.update')
-      
+
       unless apply_coupon_code
         respond_with(@order) { |format| format.html { render :edit } }
         return
@@ -13,20 +13,20 @@ Spree::CheckoutController.class_eval do
 
       # Add Klarna invoice cost
       if !@order.payment.nil? && @order.adjustments.klarna_invoice_cost.count <= 0 && @order.payment.payment_method && @order.payment.payment_method.class.name == 'Spree::PaymentMethod::KlarnaInvoice'
-        @order.adjustments.create(:amount => @order.payment.payment_method.preferred(:invoice_fee),
-                                  :source => @order,
+        @order.adjustments.create(:amount     => @order.payment.payment_method.preferred(:invoice_fee),
+                                  :source     => @order,
                                   :originator => @order.payment.payment_method,
-                                  :locked => true,
-                                  :label => I18n.t(:invoice_fee))
+                                  :locked     => true,
+                                  :label      => I18n.t(:invoice_fee))
         @order.update!
       end
-      
+
       # Remove Klarna invoice cost
       if !@order.payment.nil? && @order.adjustments.klarna_invoice_cost.count > 0 && @order.payment.payment_method && @order.payment.payment_method.class.name != 'Spree::PaymentMethod::KlarnaInvoice'
         @order.adjustments.klarna_invoice_cost.destroy_all
         @order.update!
       end
-      
+
       if @order.next
         state_callback(:after)
       else
@@ -46,8 +46,8 @@ Spree::CheckoutController.class_eval do
       respond_with(@order) { |format| format.html { render :edit } }
     end
   end
-  
+
   def set_klarna_client_ip
-    @client_ip = request.remote_ip # Set client ip
+    @client_ip = request.remote_ip
   end
 end
