@@ -1,1 +1,13 @@
-Klarna Invoice Source View
+<fieldset data-hook="klarna">
+  <legend align="center">Klarna</legend>
+
+  <div class="row">
+    <div class="alpha six columns">      
+      <dl>
+        <dt><%= t(:invoice_number) %>:</dt>
+        <dd><%= payment.source.invoice_number %></dd>
+      </dl>
+    </div>
+  </div>
+
+</fieldset>
