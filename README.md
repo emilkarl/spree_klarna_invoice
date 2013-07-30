@@ -6,9 +6,16 @@ Based on Klarna-ruby it is using the old Klarna API. There is a newer version an
 
 ## Requirements
 
-Based on *[klarna-ruby](https://github.com/merchii/klarna-ruby)* library
+- Based on *[klarna-ruby](https://github.com/merchii/klarna-ruby)* library
+- Built for Spree 1.3.x
 
-Built for Spree 1.2.0
+## Contributing
+
+1. Fork it
+2. Create your feature branch (`git checkout -b my-new-feature`)
+3. Commit your changes (`git commit -am 'Added some feature'`)
+4. Push to the branch (`git push origin my-new-feature`)
+5. Create new Pull Request
 
 ## Installation
 
@@ -32,4 +39,4 @@ __Completed__
 
 Released under the MIT license.
 
-Copyright &copy; 2012 [Emil Karlsson]([http://emilkarl.se), [Noc Webbyrå](http://nocweb.se)
+Copyright &copy; 2013 [Emil Karlsson]([http://emilkarl.se), [Noc Webbyrå](http://nocweb.se)

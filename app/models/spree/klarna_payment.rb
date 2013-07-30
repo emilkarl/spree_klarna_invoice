@@ -11,7 +11,8 @@ class Spree::KlarnaPayment < ActiveRecord::Base
 
   # Indicates whether its possible to capture the payment
   def can_capture?(payment)
-    ['checkout', 'pending', 'processing'].include?(payment.state) && !payment.order.klarna_invoice_number.blank?
+    logger.debug "\n----------- #{self.invoice_number} -----------\n"
+    ['checkout', 'pending', 'processing'].include?(payment.state) && !self.invoice_number.blank?
   end
 
   def process!
