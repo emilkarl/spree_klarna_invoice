@@ -5,7 +5,7 @@
     <div class="alpha six columns">      
       <dl>
         <dt><%= t(:invoice_number) %>:</dt>
-        <dd><%= payment.source.invoice_number %></dd>
+        <dd><%= payment.source.invoice_number unless payment.source.invoice_number.blank? %></dd>
       </dl>
     </div>
   </div>
