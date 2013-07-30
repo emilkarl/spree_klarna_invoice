@@ -9,3 +9,4 @@ nn:
   between: 'mellom'
   chars: 'tegn'
   pnr_formats: 'I noen av disse formatene'
+  invoice_number: Fakturanummer
