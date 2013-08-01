@@ -107,16 +107,16 @@ class Spree::KlarnaPayment < ActiveRecord::Base
     
     # Add products
     payment.order.line_items.each do |item|
-      logger.debug "\n----------- Item: #{item.quantity}, #{item.product.sku}, #{item.product.name}, #{item.amount} -----------\n"
+      logger.debug "\n----------- Item: #{item.quantity}, #{item.product.sku}, #{item.product.name}, #{item.price} -----------\n"
       flags = {}
       flags[:INC_VAT] = ::Klarna::API::GOODS[:INC_VAT] if default_tax_rate.included_in_price
-      order_items << @@klarna.make_goods(item.quantity, item.product.sku, item.product.name, item.product.price * 100.00, default_tax_rate.amount*100, nil, flags)
+      order_items << @@klarna.make_goods(item.quantity, item.product.sku, item.product.name, item.price * 100.00, default_tax_rate.amount*100, nil, flags)
       
       if ! default_tax_rate.included_in_price
-        item.product.price = item.product.price * (default_tax_rate.amount + 1)
+        item.price = item.price * (default_tax_rate.amount + 1)
       end
       
-      payment_amount += item.product.price
+      payment_amount += item.price
     end
     
     payment.order.adjustments.eligible.each do |adjustment|
