@@ -12,17 +12,17 @@ Spree::CheckoutController.class_eval do
       end
 
       # Add Klarna invoice cost
-      if !@order.payment.nil? && @order.adjustments.klarna_invoice_cost.count <= 0 && @order.payment.payment_method && @order.payment.payment_method.class.name == 'Spree::PaymentMethod::KlarnaInvoice'
-        @order.adjustments.create(:amount => @order.payment.payment_method.preferred(:invoice_fee),
+      if @order.payments.exists? && @order.adjustments.klarna_invoice_cost.count <= 0 && @order.payments.first.payment_method && @order.payments.first.payment_method.class.name == 'Spree::PaymentMethod::KlarnaInvoice'
+        @order.adjustments.create(:amount => @order.payments.first.payment_method.preferred(:invoice_fee),
                                   :source => @order,
-                                  :originator => @order.payment.payment_method,
+                                  :originator => @order.payments.first.payment_method,
                                   :locked => true,
                                   :label => I18n.t(:invoice_fee))
         @order.update!
       end
       
       # Remove Klarna invoice cost
-      if !@order.payment.nil? && @order.adjustments.klarna_invoice_cost.count > 0 && @order.payment.payment_method && @order.payment.payment_method.class.name != 'Spree::PaymentMethod::KlarnaInvoice'
+      if @order.payments.exists? && @order.adjustments.klarna_invoice_cost.count > 0 && @order.payments.first.payment_method && @order.payments.first.payment_method.class.name != 'Spree::PaymentMethod::KlarnaInvoice'
         @order.adjustments.klarna_invoice_cost.destroy_all
         @order.update!
       end
