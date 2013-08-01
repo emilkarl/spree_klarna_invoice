@@ -116,7 +116,7 @@ class Spree::KlarnaPayment < ActiveRecord::Base
         item.price = item.price * (default_tax_rate.amount + 1)
       end
       
-      payment_amount += item.price
+      payment_amount += item.price * item.quantity
     end
     
     payment.order.adjustments.eligible.each do |adjustment|
